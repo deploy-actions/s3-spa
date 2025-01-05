@@ -1,0 +1,87 @@
+name: Deploy SPA on S3
+description: Github Action to deploy s3 by sam
+branding:
+  icon: upload-cloud
+  color: red
+
+inputs:
+  BucketName:
+    description: S3 Bucket Name
+    required: true
+  SAMSourceBucket:
+    description: AWS S3 bucket where artifacts referenced in the template are uploaded.
+    required: false
+  SAMToken:
+    description: The GITHUB Authentication token to use for calling the GITHUB Get the latest release API. Defaults to call the API as unauthenticated request if not specified.
+    required: false
+  Alias:
+    description: Custom Domain Alias, To apply this property, you must also enter `AcmCertificateArn` and `HostedZoneId`.
+    required: false
+  AcmCertificateArn:
+    description: AWS::CloudFront::Distribution ViewerCertificate Properties, To apply this property, you must also enter `Alias` and `HostedZoneId`.
+    required: false
+  HostedZoneId:
+    description: AWS::Route53::RecordSetGroup Properties, To apply this property, you must also enter `Alias`, `AcmCertificateArn`.
+    required: false
+
+runs:
+  using: composite
+
+  steps:
+    - shell: bash
+      run: aws sts get-caller-identity >/dev/null 2>&1
+
+    - shell: bash
+      id: path
+      run: echo "path=$GITHUB_ACTION_PATH" >> "$GITHUB_OUTPUT"
+
+    - uses: aws-actions/setup-sam@v2
+      with:
+        use-installer: true
+        token: ${{ inputs.SAMToken }}
+
+    - shell: bash
+      run: |
+        cat <<EOF > config.toml
+        version = 0.1
+
+        [default.build.parameters]
+        cached = true
+        parallel = true
+
+        [default.validate.parameters]
+        lint = true
+
+        [default.deploy.parameters]
+        capabilities = "CAPABILITY_IAM"
+        confirm_changeset = false
+        resolve_s3 = true
+        stack_name = "S3SPA-${{ inputs.BucketName }}"
+        s3_prefix = "S3SPA-${{ inputs.BucketName }}"
+
+        [default.package.parameters]
+        resolve_s3 = true
+        EOF
+
+    - uses: actions/setup-node@main
+      with:
+        node-version: 20
+
+    - shell: bash
+      run: node ${{ steps.path.outputs.path }}/index.js
+      env:
+        BucketName: ${{ inputs.BucketName }}
+        Alias: ${{ inputs.Alias }}
+        AcmCertificateArn: ${{ inputs.AcmCertificateArn }}
+        HostedZoneId: ${{ inputs.HostedZoneId }}
+
+    - shell: bash
+      run: |
+        sam build --config-file config.toml
+        sam validate --config-file config.toml
+
+        if [ -n "${{ inputs.SAMSourceBucket }}" ]; then
+          sam deploy --no-fail-on-empty-changeset --s3-bucket ${{ inputs.SAMSourceBucket }} --config-file config.toml --resolve-image-repos
+        else
+          sam deploy --no-fail-on-empty-changeset --config-file config.toml --resolve-image-repos
+        fi
