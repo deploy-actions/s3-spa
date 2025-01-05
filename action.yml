@@ -24,6 +24,11 @@ inputs:
     description: AWS::Route53::RecordSetGroup Properties, To apply this property, you must also enter `Alias`, `AcmCertificateArn`.
     required: false
 
+outputs:
+  DistributionId:
+      description: "The distribution's identifier. For example: E1U5RQF7T870K0."
+      value: ${{ steps.output.outputs.DistributionId }}
+
 runs:
   using: composite
 
@@ -85,3 +90,9 @@ runs:
         else
           sam deploy --no-fail-on-empty-changeset --config-file config.toml --resolve-image-repos
         fi
+
+    - shell: bash
+      id: output
+      run: |
+        DistributionId=$(aws cloudformation describe-stacks --stack-name S3SPA-${{ inputs.BucketName }} --query "Stacks[0].Outputs[?OutputKey=='DistributionId'].OutputValue" --output text)
+        echo "DistributionId=$DistributionId" >> "$GITHUB_OUTPUT"
