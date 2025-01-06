@@ -6,6 +6,8 @@ This GitHub Action helps deploy your single-page application (SPA) to AWS. It up
 
 ## Simple Example of Usage
 
+### Minimum Options
+
 ```yml
 - name: Configure AWS credentials 🔑
   uses: aws-actions/configure-aws-credentials@v4
@@ -17,6 +19,27 @@ This GitHub Action helps deploy your single-page application (SPA) to AWS. It up
   uses: deploy-actions/s3-spa@v1
   with:
     BucketName: simple-spa
+
+- name: Upload Page
+  run: aws s3 cp --recursive "." s3://simple-spa
+```
+
+### Custom Domain Options
+
+```yml
+- name: Configure AWS credentials 🔑
+  uses: aws-actions/configure-aws-credentials@v4
+  with:
+    role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+    aws-region: ${{ vars.AWS_REGION }}
+
+- name: Setup Page
+  uses: deploy-actions/s3-spa@v1
+  with:
+    BucketName: simple-spa
+    Aliases: www.example.com
+    AcmCertificateArn: ${{ vars.ACM_ARN }}
+    HostedZoneId: ${{ vars.HostedZoneId }}
 
 - name: Upload Page
   run: aws s3 cp --recursive "." s3://simple-spa
