@@ -34,3 +34,8 @@ This GitHub Action helps deploy your single-page application (SPA) to AWS. It up
 | HostedZoneId      | AWS::Route53::RecordSetGroup Properties, To apply this property, you must also enter `Aliases`, `AcmCertificateArn`.                                            |           |         |
 
 ## Outputs
+
+| Name           | Description                                                             | Optional |
+| -------------- | ----------------------------------------------------------------------- | -------- |
+| DistributionId | The distribution's identifier. For example: E1U5RQF7T870K0.             |          |
+| DomainName     | The domain name of the resource, such as d111111abcdef8.cloudfront.net. |          |
