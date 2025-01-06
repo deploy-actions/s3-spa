@@ -28,6 +28,8 @@ An S3 bucket and a CloudFront distribution using the S3 origin method are create
 
 ### Using a Custom Domain Setup
 
+This setup connects CloudFront with alternative domain. It requires an ACM Certificate ARN and a HostedZoneId for managing the domain's DNS records.
+
 ```yml
 - name: Configure AWS credentials 🔑
   uses: aws-actions/configure-aws-credentials@v4
