@@ -6,7 +6,9 @@ This GitHub Action helps deploy your single-page application (SPA) to AWS. It up
 
 ## Simple Example of Usage
 
-### Minimum Options
+### Basic Setup
+
+An S3 bucket and a CloudFront distribution using the S3 origin method are created, configured with recommended settings for hosting a Single Page Application (SPA).
 
 ```yml
 - name: Configure AWS credentials 🔑
@@ -21,10 +23,10 @@ This GitHub Action helps deploy your single-page application (SPA) to AWS. It up
     BucketName: simple-spa
 
 - name: Upload Page
-  run: aws s3 cp --recursive "." s3://simple-spa
+  run: aws s3 cp --recursive "./dist" s3://simple-spa
 ```
 
-### Custom Domain Options
+### Using a Custom Domain Setup
 
 ```yml
 - name: Configure AWS credentials 🔑
@@ -42,7 +44,7 @@ This GitHub Action helps deploy your single-page application (SPA) to AWS. It up
     HostedZoneId: ${{ vars.HostedZoneId }}
 
 - name: Upload Page
-  run: aws s3 cp --recursive "." s3://simple-spa
+  run: aws s3 cp --recursive "./dist" s3://simple-spa
 ```
 
 ## Inputs
