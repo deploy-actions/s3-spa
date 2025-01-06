@@ -14,7 +14,7 @@ This GitHub Action helps deploy your single-page application (SPA) to AWS. It up
     aws-region: ${{ vars.AWS_REGION }}
 
 - name: Setup Page
-  uses: deploy-actions/s3-spa@main
+  uses: deploy-actions/s3-spa@v1
   with:
     BucketName: simple-spa
 
