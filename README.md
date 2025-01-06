@@ -1,2 +1,36 @@
-# s3-spa
-GitHub Action for S3 SPA Deployment by SAM
+# Deploy Single Page Application on S3
+
+## About
+
+This GitHub Action helps deploy your single-page application (SPA) to AWS. It uploads your built files to S3 and delivers them through CloudFront for fast, global content delivery. Based on AWS SAM, it supports custom domain configuration with minimal setup.
+
+## Simple Example of Usage
+
+```yml
+- name: Configure AWS credentials 🔑
+  uses: aws-actions/configure-aws-credentials@v4
+  with:
+    role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+    aws-region: ${{ vars.AWS_REGION }}
+
+- name: Setup Page
+  uses: deploy-actions/s3-spa@main
+  with:
+    BucketName: simple-spa
+
+- name: Upload Page
+  run: aws s3 cp --recursive "." s3://simple-spa
+```
+
+## Inputs
+
+| Name              | Description                                                                                                                                                     | Mandatory | Default |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
+| BucketName        | S3 Bucket Name for Single Page Application                                                                                                                      | ✅        |         |
+| SAMSourceBucket   | AWS S3 bucket where artifacts referenced in the template are uploaded.                                                                                          |           |         |
+| SAMToken          | The GITHUB Authentication token to use for calling the GITHUB Get the latest release API. Defaults to call the API as unauthenticated request if not specified. |           |         |
+| Aliases           | AWS::CloudFront::Distribution DistributionConfig Properties, To apply this property, you must also enter `AcmCertificateArn` and `HostedZoneId`.                |           |         |
+| AcmCertificateArn | AWS::CloudFront::Distribution ViewerCertificate Properties, To apply this property, you must also enter `Aliases` and `HostedZoneId`.                           |           |         |
+| HostedZoneId      | AWS::Route53::RecordSetGroup Properties, To apply this property, you must also enter `Aliases`, `AcmCertificateArn`.                                            |           |         |
+
+## Outputs
