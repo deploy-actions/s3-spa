@@ -26,8 +26,11 @@ inputs:
 
 outputs:
   DistributionId:
-      description: "The distribution's identifier. For example: E1U5RQF7T870K0."
-      value: ${{ steps.output.outputs.DistributionId }}
+    description: "The distribution's identifier. For example: E1U5RQF7T870K0."
+    value: ${{ steps.output.outputs.DistributionId }}
+  DomainName:
+    description: The domain name of the resource
+    value: ${{ steps.output.outputs.DomainName }}
 
 runs:
   using: composite
@@ -95,4 +98,6 @@ runs:
       id: output
       run: |
         DistributionId=$(aws cloudformation describe-stacks --stack-name S3SPA-${{ inputs.BucketName }} --query "Stacks[0].Outputs[?OutputKey=='DistributionId'].OutputValue" --output text)
+        DomainName=$(aws cloudformation describe-stacks --stack-name S3SPA-${{ inputs.BucketName }} --query "Stacks[0].Outputs[?OutputKey=='DomainName'].OutputValue" --output text)
         echo "DistributionId=$DistributionId" >> "$GITHUB_OUTPUT"
+        echo "DomainName=$DomainName" >> "$GITHUB_OUTPUT"
