@@ -50,6 +50,7 @@ runs:
 
     - shell: bash
       run: |
+        STACK_NAME="${{ inputs.BucketName//./- }}"
         cat <<EOF > config.toml
         version = 0.1
 
@@ -64,8 +65,8 @@ runs:
         capabilities = "CAPABILITY_IAM"
         confirm_changeset = false
         resolve_s3 = true
-        stack_name = "S3SPA-${{ inputs.BucketName }}"
-        s3_prefix = "S3SPA-${{ inputs.BucketName }}"
+        stack_name = "S3SPA-$STACK_NAME"
+        s3_prefix = "S3SPA-$STACK_NAME"
 
         [default.package.parameters]
         resolve_s3 = true
@@ -97,7 +98,8 @@ runs:
     - shell: bash
       id: output
       run: |
-        DistributionId=$(aws cloudformation describe-stacks --stack-name S3SPA-${{ inputs.BucketName }} --query "Stacks[0].Outputs[?OutputKey=='DistributionId'].OutputValue" --output text)
-        DomainName=$(aws cloudformation describe-stacks --stack-name S3SPA-${{ inputs.BucketName }} --query "Stacks[0].Outputs[?OutputKey=='DomainName'].OutputValue" --output text)
+        STACK_NAME="${{ inputs.BucketName//./- }}"
+        DistributionId=$(aws cloudformation describe-stacks --stack-name S3SPA-$STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='DistributionId'].OutputValue" --output text)
+        DomainName=$(aws cloudformation describe-stacks --stack-name S3SPA-$STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='DomainName'].OutputValue" --output text)
         echo "DistributionId=$DistributionId" >> "$GITHUB_OUTPUT"
         echo "DomainName=$DomainName" >> "$GITHUB_OUTPUT"
